@@ -45,7 +45,8 @@ function checksTodoExists(request, response, next) {
       request.todo = todo
       request.user = user
       return next()
-   }else return response.status(404).json({error: ''})
+   }else if(!!user && !!todo) return response.status(404).json({error: 'Usuário ou todo não existe!'})
+   else return response.status(400).json({error: 'id inválido!'})
 }
 
 function findUserById(request, response, next) {
