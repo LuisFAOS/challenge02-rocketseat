@@ -9,20 +9,57 @@ app.use(cors());
 
 const users = [];
 
+function findUserByUsername(usernameToFind){
+   return users.find(({username}) => username === usernameToFind)
+}
+
 function checksExistsUserAccount(request, response, next) {
-  // Complete aqui
+   const {username} = request.headers
+
+   const user = findUserByUsername(username)
+   if(!!user){
+      request.user
+      return next()
+   }
+
+   else return response.status(404).json({error: 'Usuário não encontrado!'})
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+   const { username } = request
+
+   const user = findUserByUsername(username)
+   if(!user.pro && user.todos.length < 10) return next()
+   else if(user.pro) return next()
+   else return response.status(402).json({error: 'Atualize seu plano para o nível pro e garanta novas regalias!'})
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+   const {username} = request.headers
+   const {id} = request.params
+
+   const user = findUserByUsername(username)
+   const todo = user.todos.find(todo => todo.id === id)
+
+   if(validate(id) && !!user && !!todo){
+      request.todo = todo
+      request.user = user
+      return next()
+   }else return response.status(404).json({error: ''})
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+   const {id} = request.params
+   const user = users.find(({userIDFromArray}) => userIDFromArray === id)
+
+   if(!!user){
+      request.user = user
+
+      return next()
+   }else{
+      return response.status(404).json({error: 'ID inválido/usuário não encontrado!'})
+   }
+
 }
 
 app.post('/users', (request, response) => {
